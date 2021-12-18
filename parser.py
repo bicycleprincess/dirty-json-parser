@@ -64,12 +64,6 @@ def check_quote(astring):
 def check_token(astring):
 
 	_astring = ("".join([x for x in astring if x in '"[]{}:(),']))
-	#_astring = _astring.replace('""', '')
-	
-	#all_double_quote = re.findall(r'(".*?")', _astring)
-	#for y in set(all_double_quote):
-	#	_astring = _astring.replace(y, "")
-
 	return _astring
 
 
@@ -81,10 +75,8 @@ def repair_tocken(astring):
 	astring = astring[:-(_a.index(':'))-1]
 
 	_astring = check_token(astring)
-	#print(_astring)
 	try:
 		assert _astring[0] + _astring[-1] == "{}"
-		#print("Global Curly Parathesis Passed")
 	except AssertionError:
 		if _astring[0] != "{": 
 			astring = "{" + astring
