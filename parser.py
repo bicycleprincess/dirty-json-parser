@@ -18,9 +18,9 @@ def repair_whole(astring):
 
 	idx = _ord.count(max(_ord))
 	rst = []
-	for x in range(idx):
+	for _ in range(idx):
 		rst.append("".join(_a[:_ord.index(max(_ord))+1]))
-		_a = _a[:_ord.index(max(_ord))]
+		_a = _a[_ord.index(max(_ord)):]
 	rst.append(_a)
 	return(rst)
 
@@ -49,13 +49,12 @@ def check_quote(astring):
 	for i in range(len(a_list)):
 		sub = a_list[i]
 		if sub.count('"') % 2 == 1:
-			print(sub)
 			if sub[-1] != '"': sub += '"'
 			elif '{' in sub and sub[sub.index('{')+1] != '"':
 				sub = sub[:sub.index('{')+1]+'"'+sub[sub.index('{')+1:]
 			elif re.findall(r'"(.*?)",(.*?)"', sub):
 				sub = sub[:sub.index(',')+1]+'"'+sub[sub.index(',')+1:]
-			elif re.findall(r'"(.*?),"(.*?)"', sub):
+			elif re.findall(r'§', sub):
 				sub = sub[:sub.index(',')]+'"'+sub[sub.index(','):]
 		a_list[i] = sub
 	return ":".join(a_list)
@@ -97,15 +96,16 @@ def repair_tocken(astring):
 	new = astring + memo[::-1]
 	return new
 
-def run(new):
+def run(new, n=500):
 
-	while not check_json(new):
+	while not check_json(new) and n != 0:
 		new = new[::-1]
 		idx = min([new.index(x) for x in '{}'])
 		new = new[::-1]
 		new = new[:-idx-1]
 		new = repair_tocken(new)
-	print(new)
+		n -= 1
+	return new
 
 
 if __name__ == '__main__':
@@ -114,13 +114,14 @@ if __name__ == '__main__':
 	data = string.read()
 	string.close()
 
-	x = check_global(data)
-	if x > 1:
-		n = repair_whole(data)
-		for new in n:
-			new = clean_up(new)
-			run(new)
-	else:
-		new = clean_up(data)
-		run(new)
+	new = clean_up(data)
+	new = run(new)
 
+	if not check_json(new):
+		n = repair_whole(data)
+		for i in n:
+			new = clean_up(i)
+			new = run(new)
+			print(new)
+	else:
+		print(new)
